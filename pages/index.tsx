@@ -66,7 +66,7 @@ export default function Home() {
         ) : (
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
             {siswa.map((nama, i) => {
-              const url = `${domain}/absen?nama=${encodeURIComponent(nama)}`;
+           const url = `https://absensiku-three.vercel.app/absen?nama=${encodeURIComponent(nama)}`;
               return (
                 <div
                   key={i}
