@@ -5,16 +5,21 @@ export default function TambahSiswa() {
   const [nama, setNama] = useState('');
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Kirim nama ke localStorage sementara (karena belum pakai database)
-    const dataSiswa = JSON.parse(localStorage.getItem('siswa') || '[]');
+    const dataSiswa: string[] = JSON.parse(localStorage.getItem('siswa') || '[]');
+
+    if (dataSiswa.includes(nama)) {
+      alert(`Siswa dengan nama "${nama}" sudah ada!`);
+      return;
+    }
+
     dataSiswa.push(nama);
     localStorage.setItem('siswa', JSON.stringify(dataSiswa));
 
-    alert(`Siswa ${nama} berhasil ditambahkan!`);
-    router.push('/');
+    alert(`Siswa "${nama}" berhasil ditambahkan!`);
+    router.push('/daftar');
   };
 
   return (

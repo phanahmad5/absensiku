@@ -1,125 +1,98 @@
-import React, { useEffect, useState } from 'react';
+'use client';
+
+import { useEffect, useState } from 'react';
 import QRCode from 'react-qr-code';
+import Link from 'next/link';
 
 export default function Home() {
   const [siswa, setSiswa] = useState<string[]>([]);
 
   useEffect(() => {
-    const data = localStorage.getItem('siswa');
-    if (data) {
-      setSiswa(JSON.parse(data));
-    }
+    const data = JSON.parse(localStorage.getItem('siswa') || '[]');
+    setSiswa(data);
   }, []);
-
-  const handleHapus = (namaHapus: string) => {
-    const konfirmasi = confirm(`Hapus siswa "${namaHapus}"?`);
-    if (!konfirmasi) return;
-
-    const siswaBaru = siswa.filter((nama) => nama !== namaHapus);
-    localStorage.setItem('siswa', JSON.stringify(siswaBaru));
-    setSiswa(siswaBaru);
-  };
-
-  const domain = 'https://absensiku-three.vercel.app'; // Ganti sesuai deploy kamu
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', fontFamily: 'Arial, sans-serif' }}>
       {/* Sidebar */}
-      <div
+      <aside
         style={{
           width: '220px',
           backgroundColor: '#048a0f',
-          color: 'white',
-          padding: '20px',
+          color: '#fff',
+          padding: '30px 20px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '20px',
         }}
       >
-        <h2 style={{ fontSize: '20px', marginBottom: '30px' }}>Menu</h2>
-        <ul style={{ listStyle: 'none', padding: 0 }}>
-          <li><a href="/" style={linkStyle}>📋 QR Siswa</a></li>
-          <li><a href="/tambah" style={linkStyle}>➕ Tambah Siswa</a></li>
-          <li><a href="/upload" style={linkStyle}>⬆️ Upload CSV</a></li>
-          <li><a href="/absen" style={linkStyle}>🖊️ Halaman Absen</a></li>
-          <li>
-            <a
-              href="https://script.google.com/macros/s/AKfycbwfNblUe6E0BYynhAWU41VQrvY7SaleVOinT3wsdVU-6nfPJkwwvIS_0b8nOZ2JznQY1Q/exec"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={linkStyle}
-            >
-              📊 Google Sheet
-            </a>
-          </li>
-        </ul>
-      </div>
+        <h2 style={{ fontSize: '22px', marginBottom: '10px' }}>📋 Absensi</h2>
+        <SidebarLink href="/">📌 Dashboard</SidebarLink>
+        <SidebarLink href="/daftar">👥 Data Siswa</SidebarLink>
+        <SidebarLink href="/tambah">➕ Tambah Siswa</SidebarLink>
+        <SidebarLink href="/lihat-absen">📅 Lihat Absensi</SidebarLink>
+
+        <SidebarLink href="#">🚪 Logout</SidebarLink>
+      </aside>
 
       {/* Konten Utama */}
-      <div style={{ flex: 1, padding: '30px', maxWidth: '1000px' }}>
-        <h1 style={{ marginBottom: '20px' }}>QR Code Absensi Siswa</h1>
+      <main style={{ flex: 1, padding: '40px' }}>
+        <h1 style={{ marginBottom: '30px', fontSize: '26px' }}>QR Code Absensi Siswa</h1>
 
         {siswa.length === 0 ? (
-          <div>
-            <p>Belum ada data siswa. Silakan tambah siswa terlebih dahulu.</p>
-            <a href="/tambah" style={{ color: '#048a0f', textDecoration: 'underline' }}>
-              ➕ Tambah Siswa
-            </a>
-          </div>
+          <p style={{ fontSize: '16px' }}>Belum ada data siswa. Silakan <Link href="/tambah" style={{ color: '#048a0f', textDecoration: 'underline' }}>tambah siswa</Link>.</p>
         ) : (
-          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
             {siswa.map((nama, i) => {
-           const url = `https://absensiku-three.vercel.app/absen?nama=${encodeURIComponent(nama)}`;
+           const linkAbsen = `https://absensiku-three.vercel.app/absen?nama=${encodeURIComponent(nama)}`;
               return (
                 <div
                   key={i}
                   style={{
-                    margin: '15px',
                     padding: '20px',
-                    borderRadius: '16px',
-                    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+                    border: '1px solid #ccc',
+                    borderRadius: '12px',
+                    width: '250px',
+                    backgroundColor: '#f9f9f9',
+                    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
                     textAlign: 'center',
-                    width: '230px',
-                    backgroundColor: '#ffffff',
-                    transition: 'transform 0.2s',
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.03)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
                 >
-                  <p style={{ fontWeight: 'bold', fontSize: '18px', marginBottom: '10px' }}>{nama}</p>
-                  <div style={{ backgroundColor: '#f2f2f2', padding: '10px', borderRadius: '8px' }}>
-                    <QRCode value={url} size={150} />
-                  </div>
-                  <p style={{ fontSize: '12px', marginTop: '10px', color: '#555', wordWrap: 'break-word' }}>
-                    {url}
-                  </p>
-                  <button
-                    onClick={() => handleHapus(nama)}
+                  <p style={{ fontWeight: 'bold', marginBottom: '10px' }}>{nama}</p>
+                  <QRCode value={linkAbsen} size={150} />
+                  <p
                     style={{
-                      marginTop: '10px',
-                      padding: '6px 12px',
                       fontSize: '12px',
-                      backgroundColor: '#e74c3c',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '5px',
-                      cursor: 'pointer',
+                      marginTop: '10px',
+                      wordWrap: 'break-word',
+                      color: '#555',
                     }}
                   >
-                    Hapus
-                  </button>
+                    {linkAbsen}
+                  </p>
                 </div>
               );
             })}
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }
 
-const linkStyle: React.CSSProperties = {
-  color: 'white',
-  textDecoration: 'none',
-  display: 'block',
-  padding: '10px 0',
-  fontWeight: 'bold',
-  cursor: 'pointer',
-};
+// Komponen Link Sidebar
+function SidebarLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link href={href} passHref>
+      <span style={{
+        color: '#fff',
+        textDecoration: 'none',
+        fontSize: '16px',
+        cursor: 'pointer',
+        transition: '0.2s',
+      }}>
+        {children}
+      </span>
+    </Link>
+  );
+}

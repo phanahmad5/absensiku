@@ -1,40 +1,60 @@
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+'use client';
 
-export default function Absen() {
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/router';
+
+export default function AbsenPage() {
+  const searchParams = useSearchParams();
+  const [status, setStatus] = useState('Memproses absensi...');
   const router = useRouter();
-  const { nama } = router.query;
-  const [status, setStatus] = useState('Menyiapkan absensi...');
 
   useEffect(() => {
-    if (!router.isReady) return;
-    if (typeof nama !== 'string') {
+    const nama = searchParams.get('nama');
+    if (!nama) {
       setStatus('Nama tidak ditemukan di URL.');
       return;
     }
 
-    setStatus('Mengirim absensi...');
+    const waktuSekarang = new Date().toLocaleString('id-ID', {
+      dateStyle: 'short',
+      timeStyle: 'medium',
+    });
 
-    fetch('https://script.google.com/macros/s/AKfycbxbfCAf3HNaEVgfUdzS6_fjmeD-WAmdEEM95SfJghBgO3ue2nKxzPH-Flf--TWruABL/exec', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ nama }),
-    })
-      .then((res) => res.text())
-      .then(() => {
-        setStatus(`✅ Terima kasih, ${nama}! Absensi berhasil.`);
-      })
-      .catch((err) => {
-        setStatus('❌ Gagal mengirim absensi.');
-      });
-  }, [router.isReady, nama]);
+    // Ambil absensi lama dari localStorage
+    const dataAbsen = JSON.parse(localStorage.getItem('absensi') || '[]');
+
+    // Cek jika siswa sudah absen (opsional, hanya jika ingin mencegah duplikat)
+    const sudahAbsen = dataAbsen.find((item: any) => item.nama === nama);
+    if (sudahAbsen) {
+      setStatus(`Siswa "${nama}" sudah pernah absen!`);
+      return;
+    }
+
+    // Tambahkan data baru
+    const dataBaru = [...dataAbsen, { nama, waktu: waktuSekarang }];
+    localStorage.setItem('absensi', JSON.stringify(dataBaru));
+
+    setStatus(`✅ Absensi berhasil untuk "${nama}" pada ${waktuSekarang}`);
+
+    // Optional: Redirect ke halaman /lihat-absen
+    // setTimeout(() => router.push('/lihat-absen'), 3000);
+  }, [searchParams]);
 
   return (
-    <div style={{ padding: 40, textAlign: 'center' }}>
-      <h1>Absensi</h1>
-      <p>{status}</p>
+    <div style={{
+      fontFamily: 'Arial',
+      height: '100vh',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      textAlign: 'center',
+      padding: '20px',
+    }}>
+      <div>
+        <h1>Halaman Absensi</h1>
+        <p style={{ marginTop: '20px', fontSize: '18px' }}>{status}</p>
+      </div>
     </div>
   );
 }
