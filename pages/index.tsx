@@ -20,8 +20,7 @@ export default function Home() {
     setSiswa(siswaBaru);
   };
 
-  // 🔥 Hanya gunakan domain production (tanpa fallback localhost)
-  const domain = 'https://absensiku-three.vercel.app';
+  const domain = 'https://absensiku-three.vercel.app'; // Ganti sesuai deploy kamu
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', fontFamily: 'Arial, sans-serif' }}>
@@ -40,23 +39,34 @@ export default function Home() {
           <li><a href="/tambah" style={linkStyle}>➕ Tambah Siswa</a></li>
           <li><a href="/upload" style={linkStyle}>⬆️ Upload CSV</a></li>
           <li><a href="/absen" style={linkStyle}>🖊️ Halaman Absen</a></li>
-          <li><a href="https://script.google.com/macros/s/AKfycbxYUDEB0LUdUPQ4ovxbMHPI5evrl3voRIJHWuwbA-W_8lfYK0PrWMgjgTv6i3V3IgbRoQ/exec" target="_blank" style={linkStyle}>📊 Google Sheet</a></li>
+          <li>
+            <a
+              href="https://script.google.com/macros/s/AKfycbwfNblUe6E0BYynhAWU41VQrvY7SaleVOinT3wsdVU-6nfPJkwwvIS_0b8nOZ2JznQY1Q/exec"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={linkStyle}
+            >
+              📊 Google Sheet
+            </a>
+          </li>
         </ul>
       </div>
 
-      {/* Konten */}
+      {/* Konten Utama */}
       <div style={{ flex: 1, padding: '30px', maxWidth: '1000px' }}>
         <h1 style={{ marginBottom: '20px' }}>QR Code Absensi Siswa</h1>
 
         {siswa.length === 0 ? (
           <div>
             <p>Belum ada data siswa. Silakan tambah siswa terlebih dahulu.</p>
-            <a href="/tambah" style={{ color: '#048a0f', textDecoration: 'underline' }}>➕ Tambah Siswa</a>
+            <a href="/tambah" style={{ color: '#048a0f', textDecoration: 'underline' }}>
+              ➕ Tambah Siswa
+            </a>
           </div>
         ) : (
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
             {siswa.map((nama, i) => {
-              const linkAbsen = `${domain}/absen?nama=${encodeURIComponent(nama)}`;
+              const url = `${domain}/absen?nama=${encodeURIComponent(nama)}`;
               return (
                 <div
                   key={i}
@@ -75,10 +85,10 @@ export default function Home() {
                 >
                   <p style={{ fontWeight: 'bold', fontSize: '18px', marginBottom: '10px' }}>{nama}</p>
                   <div style={{ backgroundColor: '#f2f2f2', padding: '10px', borderRadius: '8px' }}>
-                    <QRCode value={linkAbsen} size={150} />
+                    <QRCode value={url} size={150} />
                   </div>
                   <p style={{ fontSize: '12px', marginTop: '10px', color: '#555', wordWrap: 'break-word' }}>
-                    {linkAbsen}
+                    {url}
                   </p>
                   <button
                     onClick={() => handleHapus(nama)}
@@ -105,7 +115,6 @@ export default function Home() {
   );
 }
 
-// Gaya link sidebar
 const linkStyle: React.CSSProperties = {
   color: 'white',
   textDecoration: 'none',
