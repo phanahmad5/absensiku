@@ -7,7 +7,7 @@ export default function Absen() {
   const [status, setStatus] = useState('Menyiapkan absensi...');
 
   useEffect(() => {
-    if (!router.isReady) return; // pastikan router siap
+    if (!router.isReady) return;
     if (typeof nama !== 'string') {
       setStatus('Nama tidak ditemukan di URL.');
       return;
@@ -24,18 +24,17 @@ export default function Absen() {
     })
       .then((res) => res.text())
       .then(() => {
-        setStatus(`✅ Terima kasih, ${nama}! Absensi berhasil dikirim.`);
+        setStatus(`✅ Terima kasih, ${nama}! Absensi berhasil.`);
       })
       .catch((err) => {
-        setStatus('❌ Gagal mengirim absensi. Silakan coba lagi.');
-        console.error('Error:', err);
+        setStatus('❌ Gagal mengirim absensi.');
       });
   }, [router.isReady, nama]);
 
   return (
-    <div style={{ padding: '40px', textAlign: 'center', fontFamily: 'Arial, sans-serif' }}>
-      <h1>Absensi Siswa</h1>
-      <p style={{ fontSize: '18px', marginTop: '20px' }}>{status}</p>
+    <div style={{ padding: 40, textAlign: 'center' }}>
+      <h1>Absensi</h1>
+      <p>{status}</p>
     </div>
   );
 }
