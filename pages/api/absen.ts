@@ -7,7 +7,7 @@ export default async function handler(
   if (req.method === 'POST') {
     const { nama } = req.body;
 
-    const webhookUrl = 'https://script.google.com/macros/s/AKfycbzYy91rLOQOuIj73QR9EngbNcJwIkzAIkLctWgCkUq21mCY0qfXfRuGuKAwz0E7jS24/exec';
+    const webhookUrl = 'https://script.google.com/macros/s/AKfycbxbfCAf3HNaEVgfUdzS6_fjmeD-WAmdEEM95SfJghBgO3ue2nKxzPH-Flf--TWruABL/exec';
 
     try {
       await fetch(webhookUrl, {
