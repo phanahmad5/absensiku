@@ -4,7 +4,6 @@ import QRCode from 'react-qr-code';
 export default function Home() {
   const [siswa, setSiswa] = useState<string[]>([]);
 
-  // Ambil data dari localStorage saat pertama kali dimuat
   useEffect(() => {
     const data = localStorage.getItem('siswa');
     if (data) {
@@ -12,7 +11,6 @@ export default function Home() {
     }
   }, []);
 
-  // Hapus siswa dari localStorage dan state
   const handleHapus = (namaHapus: string) => {
     const konfirmasi = confirm(`Hapus siswa "${namaHapus}"?`);
     if (!konfirmasi) return;
@@ -22,11 +20,8 @@ export default function Home() {
     setSiswa(siswaBaru);
   };
 
-  // Tentukan base URL berdasarkan mode dev / production
-  const domain =
-    process.env.NODE_ENV === 'production'
-      ? 'https://absensiku.vercel.app' // Ganti sesuai domain deploy-mu
-      : 'http://localhost:3000';
+  // 🔥 Hanya gunakan domain production (tanpa fallback localhost)
+  const domain = 'https://absensiku-three.vercel.app';
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', fontFamily: 'Arial, sans-serif' }}>
@@ -45,16 +40,19 @@ export default function Home() {
           <li><a href="/tambah" style={linkStyle}>➕ Tambah Siswa</a></li>
           <li><a href="/upload" style={linkStyle}>⬆️ Upload CSV</a></li>
           <li><a href="/absen" style={linkStyle}>🖊️ Halaman Absen</a></li>
-          <li><a href="https://docs.google.com/spreadsheets" target="_blank" style={linkStyle}>📊 Google Sheet</a></li>
+          <li><a href="https://script.google.com/macros/s/AKfycbxYUDEB0LUdUPQ4ovxbMHPI5evrl3voRIJHWuwbA-W_8lfYK0PrWMgjgTv6i3V3IgbRoQ/exec" target="_blank" style={linkStyle}>📊 Google Sheet</a></li>
         </ul>
       </div>
 
-      {/* Konten Utama */}
-      <div style={{ flex: 1, padding: '30px' }}>
+      {/* Konten */}
+      <div style={{ flex: 1, padding: '30px', maxWidth: '1000px' }}>
         <h1 style={{ marginBottom: '20px' }}>QR Code Absensi Siswa</h1>
 
         {siswa.length === 0 ? (
-          <p>Belum ada data siswa. Silakan tambah siswa terlebih dahulu.</p>
+          <div>
+            <p>Belum ada data siswa. Silakan tambah siswa terlebih dahulu.</p>
+            <a href="/tambah" style={{ color: '#048a0f', textDecoration: 'underline' }}>➕ Tambah Siswa</a>
+          </div>
         ) : (
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
             {siswa.map((nama, i) => {
@@ -114,4 +112,5 @@ const linkStyle: React.CSSProperties = {
   display: 'block',
   padding: '10px 0',
   fontWeight: 'bold',
+  cursor: 'pointer',
 };
