@@ -3,15 +3,24 @@ import { useRouter } from 'next/router';
 
 export default function Absen() {
   const router = useRouter();
-  const { nama, utusan, pelatihan } = router.query;
   const [status, setStatus] = useState('Mengirim absensi...');
   const [isSending, setIsSending] = useState(false);
 
   useEffect(() => {
-    // Jangan kirim absensi jika parameter belum siap
-    if (!router.isReady || !nama || !utusan || !pelatihan) return;
+    if (!router.isReady) return;
 
-    // Hindari pengiriman ulang
+    // Ambil parameter sebagai string
+    const namaParam = Array.isArray(router.query.nama) ? router.query.nama[0] : router.query.nama;
+    const utusanParam = Array.isArray(router.query.utusan) ? router.query.utusan[0] : router.query.utusan;
+    const pelatihanParam = Array.isArray(router.query.pelatihan)
+      ? router.query.pelatihan.join(', ')
+      : router.query.pelatihan;
+
+    if (!namaParam || !utusanParam || !pelatihanParam) {
+      setStatus('❌ Data absensi tidak lengkap.');
+      return;
+    }
+
     if (isSending) return;
     setIsSending(true);
 
@@ -25,15 +34,15 @@ export default function Absen() {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              nama,
-              utusan,
-              pelatihan: Array.isArray(pelatihan) ? pelatihan.join(', ') : pelatihan,
+              nama: namaParam,
+              utusan: utusanParam,
+              pelatihan: pelatihanParam,
             }),
           }
         );
 
         if (response.ok) {
-          setStatus(`✅ Terima kasih, ${nama}! Absensi berhasil dikirim.`);
+          setStatus(`✅ Terima kasih, ${namaParam}! Absensi berhasil dikirim.`);
         } else {
           const errMsg = await response.text();
           console.error('Respon tidak OK:', errMsg);
@@ -46,7 +55,7 @@ export default function Absen() {
     };
 
     kirimAbsensi();
-  }, [router.isReady, nama, utusan, pelatihan]);
+  }, [router.isReady, router.query]);
 
   return (
     <div style={{
