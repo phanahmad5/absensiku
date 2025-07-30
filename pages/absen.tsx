@@ -5,9 +5,15 @@ export default function Absen() {
   const router = useRouter();
   const { nama, utusan, pelatihan } = router.query;
   const [status, setStatus] = useState('Mengirim absensi...');
+  const [isSending, setIsSending] = useState(false);
 
   useEffect(() => {
-    if (!nama || !utusan || !pelatihan) return;
+    // Jangan kirim absensi jika parameter belum siap
+    if (!router.isReady || !nama || !utusan || !pelatihan) return;
+
+    // Hindari pengiriman ulang
+    if (isSending) return;
+    setIsSending(true);
 
     const kirimAbsensi = async () => {
       try {
@@ -21,28 +27,38 @@ export default function Absen() {
             body: JSON.stringify({
               nama,
               utusan,
-              pelatihan: Array.isArray(pelatihan) ? pelatihan.join(',') : pelatihan,
+              pelatihan: Array.isArray(pelatihan) ? pelatihan.join(', ') : pelatihan,
             }),
           }
         );
 
         if (response.ok) {
-          setStatus(`Terima kasih, ${nama}! Absensi berhasil.`);
+          setStatus(`✅ Terima kasih, ${nama}! Absensi berhasil dikirim.`);
         } else {
-          setStatus('Gagal mengirim absensi. Coba lagi.');
-          console.error('Respon tidak OK:', await response.text());
+          const errMsg = await response.text();
+          console.error('Respon tidak OK:', errMsg);
+          setStatus('❌ Gagal mengirim absensi. Silakan coba lagi.');
         }
-      } catch (err) {
-        setStatus('Gagal mengirim absensi.');
-        console.error('Error saat mengirim:', err);
+      } catch (error) {
+        console.error('Kesalahan saat mengirim absensi:', error);
+        setStatus('❌ Terjadi kesalahan saat mengirim absensi.');
       }
     };
 
     kirimAbsensi();
-  }, [nama, utusan, pelatihan]);
+  }, [router.isReady, nama, utusan, pelatihan]);
 
   return (
-    <div style={{ textAlign: 'center', padding: '2rem' }}>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: '100vh',
+      fontFamily: 'sans-serif',
+      textAlign: 'center',
+      padding: '2rem'
+    }}>
       <h1>{status}</h1>
     </div>
   );
