@@ -1,0 +1,8 @@
+-- CreateTable
+CREATE TABLE "Absen" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "nama" TEXT NOT NULL,
+    "utusan" TEXT NOT NULL,
+    "pelatihan" TEXT NOT NULL,
+    "tanggal" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

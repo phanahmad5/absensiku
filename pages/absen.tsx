@@ -1,72 +1,45 @@
+// pages/absen.tsx
+'use client';
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 
-export default function Absen() {
+export default function AbsenPage() {
   const router = useRouter();
-  const [status, setStatus] = useState('Mengirim absensi...');
-  const [isSending, setIsSending] = useState(false);
+  const { nama, utusan, pelatihan } = router.query;
+
+  const [status, setStatus] = useState('Mengirim data...');
 
   useEffect(() => {
-    if (!router.isReady) return;
-
-    const nama = router.query.nama;
-    const utusan = router.query.utusan;
-    const pelatihan = router.query.pelatihan;
-
-    if (!nama || !utusan || !pelatihan) {
-      setStatus('❌ Data absensi tidak lengkap.');
-      return;
-    }
-
-    if (isSending) return;
-    setIsSending(true);
-
-    const kirimAbsensi = async () => {
-      try {
-        const response = await fetch(
-          'https://script.google.com/macros/s/AKfycbx4iW_Irrufb0QLcY5-oeleoOYWuOrGlQyx2ToRg9tH-AVdNdIvlH26cuhZemc7Zmpu_A/exec',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              nama,
-              utusan,
-              pelatihan,
-            }),
+    if (nama && utusan && pelatihan) {
+      fetch('/api/absen', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nama, utusan, pelatihan }),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.message === 'Sukses') {
+            setStatus(`✅ Anda berhasil absen atas nama ${nama}`);
+          } else {
+            setStatus('❌ Gagal: ' + data.message);
           }
-        );
-
-        const text = await response.text(); // Ambil isi respon
-
-        if (response.ok && text.includes('Success')) {
-          setStatus(`✅ Terima kasih, ${nama}! Absensi berhasil dikirim.`);
-        } else {
-          console.error('Respon tidak OK:', text);
-          setStatus('❌ Gagal mengirim absensi. Silakan coba lagi.');
-        }
-      } catch (error) {
-        console.error('Kesalahan saat mengirim absensi:', error);
-        setStatus('❌ Terjadi kesalahan saat mengirim absensi.');
-      }
-    };
-
-    kirimAbsensi();
-  }, [router.isReady, router.query]);
+        })
+        .catch(() => {
+          setStatus('❌ Terjadi kesalahan saat mengirim data.');
+        });
+    }
+  }, [nama, utusan, pelatihan]);
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      height: '100vh',
-      fontFamily: 'sans-serif',
-      textAlign: 'center',
-      padding: '2rem'
-    }}>
-      <h1>{status}</h1>
+    <div style={{ padding: '2rem', textAlign: 'center' }}>
+      <h1>Absensi Peserta</h1>
+      <p><strong>Nama:</strong> {nama}</p>
+      <p><strong>Utusan:</strong> {utusan}</p>
+      <p><strong>Pelatihan:</strong> {pelatihan}</p>
+      <p><strong>Status:</strong> {status}</p>
     </div>
   );
 }
